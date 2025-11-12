@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新規登録 - Malt Log</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Interフォントと日本語フォント -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #1a1a1a; /* 非常に暗いグレー（ほぼ黒） */
+            color: #e0e0e0; /* 明るすぎない白 */
+        }
+        .font-serif {
+            font-family: 'Noto Serif JP', serif;
+        }
+        /* ウイスキーの琥珀色（アクセント） */
+        .whisky-gold {
+            color: #eab308; /* Tailwindの amber-500 */
+        }
+        .bg-whisky-gold {
+            background-color: #eab308;
+        }
+        .border-whisky-gold {
+            border-color: #eab308;
+        }
+        
+        /* フォームの共通スタイル */
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #4b5563; /* border-gray-600 */
+            background-color: #374151; /* bg-gray-700 */
+            color: #e0e0e0;
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #eab308; /* whisky-gold */
+            box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.5); /* ring-whisky-gold */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen flex flex-col">
+
+    <!-- ===== ヘッダー (要件に合わせ、ロゴのみ) ===== -->
+    <header class="bg-black bg-opacity-70 sticky top-0 z-50 backdrop-blur-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-center items-center">
+            <!-- ロゴ -->
+            <div class="text-2xl font-bold font-serif">
+                <span class="whisky-gold">M</span>alt <span class="whisky-gold">L</span>og
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===== メインコンテンツ (新規登録フォーム) ===== -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        
+        <!-- フォームコンテナ -->
+        <div class="w-full max-w-md bg-gray-800 p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-700">
+            
+            <h2 class="font-serif text-3xl font-bold text-center mb-8 text-gray-100">
+                新規登録
+            </h2>
+            
+            <p class="text-center text-sm mb-6 text-gray-400">
+                Malt Logに参加して、あなただけの一杯を記録しましょう。
+            </p>
+
+            <!-- ERB Form Start -->
+            <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+                <%= render "devise/shared/error_messages", resource: resource %>
+
+                <!-- ニックネーム -->
+                <div class="field">
+                    <%= f.label :nickname, class: "block text-sm font-medium text-gray-300 mb-1" %>
+                    <em class="text-xs text-gray-500 block mb-1">(6文字まで)</em>
+                    <%= f.text_field :nickname, autofocus: true, maxlength: "12", class: "input-field", placeholder: "お気に入りのバーネームなど" %>
+                </div>
+
+                <!-- メールアドレス -->
+                <div class="field">
+                    <%= f.label :email, class: "block text-sm font-medium text-gray-300 mb-1" %><br />
+                    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input-field", placeholder: "example@whisky.com" %>
+                </div>
+
+                <!-- パスワード -->
+                <div class="field">
+                    <%= f.label :password, class: "block text-sm font-medium text-gray-300 mb-1" %>
+                    <% if @minimum_password_length %>
+                    <em class="text-xs text-gray-500 block mb-1">(<%= @minimum_password_length %>文字以上)</em>
+                    <% end %>
+                    <%= f.password_field :password, autocomplete: "new-password", class: "input-field" %>
+                </div>
+
+                <!-- パスワード（確認用） -->
+                <div class="field">
+                    <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-300 mb-1" %><br />
+                    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input-field" %>
+                </div>
+
+                <!-- 送信ボタン -->
+                <div class="actions pt-4">
+                    <%= f.submit "新規登録", class: "w-full bg-whisky-gold text-gray-900 font-bold py-3 px-4 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 cursor-pointer shadow-md" %>
+                </div>
+            <% end %>
+            <!-- ERB Form End -->
+
+            <!-- ログインリンクなど -->
+            <div class="mt-8 text-center text-sm">
+                <%= render "devise/shared/links", class: "text-whisky-gold hover:text-yellow-400 transition duration-300" %>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ===== フッター (簡略化) ===== -->
+    <footer class="bg-black text-gray-400 py-4 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-xs">&copy; 2025 Malt Log</p>
+        </div>
+    </footer>
+
+</body>
+</html>
