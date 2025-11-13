@@ -42,9 +42,9 @@
 <header class="bg-black bg-opacity-70 sticky top-0 z-50 backdrop-blur-sm">
   <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
     <!-- ロゴ -->
-    <div class="text-2xl font-bold font-serif">
+    <%= link_to root_path, class: "text-2xl font-bold font-serif" do %>
       <span class="whisky-gold">M</span>alt <span class="whisky-gold">L</span>og
-    </div>
+    <% end %>
 
     <!-- ナビゲーション（デスクトップ） -->
     <div class="hidden md:flex items-center space-x-6">
@@ -53,7 +53,7 @@
 
       <% if user_signed_in? %>
         <!-- ログイン時のみ表示 -->
-        <%= link_to "ウイスキーを記録する", "#create-log", class: "nav-user bg-whisky-gold text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300" %>
+        <%= link_to "ウイスキーを記録する", new_whisky_path, class: "nav-user bg-whisky-gold text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300" %>
         <%= link_to current_user.nickname, "#mypage", class: "nav-user hover:text-whisky-gold transition duration-300" %>
         <li><%= link_to 'ログアウト', destroy_user_session_path, data: { turbo_method: :delete }, class: "logout" %></li>
       <% else %>
@@ -90,18 +90,11 @@
                 </h1>
                 <p class="text-xl text-gray-300 mb-8">予算内で見つかる、あなた好みの一本と飲み方を記録・発見しよう。</p>
                 
-                <!-- ログアウト時 -->
-                <div class="nav-guest">
-                    <a href="#register" class="bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300">
-                        今すぐ始める (無料)
-                    </a>
-                </div>
-                <!-- ログイン時 -->
-                <div class="nav-user">
-                    <a href="#create-log" class="bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300">
-                        試行ログを作成する
-                    </a>
-                </div>
+                <% if user_signed_in? %>
+                  <%= link_to "試行ログを作成する", new_whisky_path, class: "bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300" %>
+                <% else %>
+                  <%= link_to "今すぐ始める (無料)", new_user_registration_path, class: "bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300" %>
+                <% end %>
             </div>
         </section>
 
@@ -113,7 +106,7 @@
                 <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
                     <h2 class="font-serif text-3xl font-semibold mb-4 whisky-gold">記録する (Log)</h2>
                     <p class="text-gray-300 mb-6">飲んだウイスキー、飲み方、グラス、感想を記録。あなただけのデータベースを構築。</p>
-                    <a href="#create-log" class="nav-user text-whisky-gold font-semibold hover:underline">▶ ログ作成ページへ</a>
+                    <%= link_to "▶ ログ作成ページへ", new_whisky_path, class: "nav-user text-whisky-gold font-semibold hover:underline" %>
                     <p class="nav-guest text-gray-500">（ログイン後に利用可能です）</p>
                 </div>
                 <!-- 探す -->
