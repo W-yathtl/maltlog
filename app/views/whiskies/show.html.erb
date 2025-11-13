@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= @whisky.whisky_name %> - Whisky Log</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .font-serif {
+            font-family: 'Noto Serif JP', serif;
+        }
+        .whisky-gold {
+            color: #eab308;
+        }
+        .bg-whisky-gold {
+            background-color: #eab308;
+        }
+        .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .detail-value {
+            font-size: 1.125rem;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <%# ヘッダー %>
+    <%= render partial: "header" %>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- 投稿詳細 -->
+        <div class="max-w-5xl mx-auto bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg">
+            <h1 class="font-serif text-4xl font-bold mb-2">
+                <%= @whisky.whisky_name %>
+            </h1>
+            <p class="text-gray-400 mb-6">投稿者: <%= @whisky.user.email.split('@').first %></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- 左カラム: 写真 -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="detail-label mb-2">ボトルの写真</label>
+                        <% if @whisky.whisky_photo.attached? %>
+                        <%= image_tag @whisky.whisky_photo.variant(resize_to_limit: [300, 300]).processed, alt: "ボトルの写真" %>                        <% else %>
+                            <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Bottle+Photo" alt="ボトルの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
+                        <% end %>
+                    </div>
+                    <div>
+                        <label class="detail-label mb-2">グラスの写真</label>
+                        <% if @whisky.glass_photo.attached? %>
+                            <%= image_tag @whisky.glass_photo.variant(resize_to_limit: [300, 300]).processed, alt: "グラスの写真" %>  
+                        <% else %>
+                            <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Glass+Photo" alt="グラスの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
+                        <% end %>
+                    </div>
+                </div>
+
+                <!-- 右カラム: 詳細情報 -->
+                <div class="space-y-6">
+                    <div>
+                        <span class="detail-label">飲み方</span>
+                        <span class="detail-value">
+                            <% 
+                              drink_styles = {
+                                "straight" => "ストレート",
+                                "rock" => "ロック",
+                                "water" => "加水",
+                                "highball" => "ハイボール",
+                                "hot" => "ホット",
+                                "cocktail" => "カクテル"
+                              }
+                            %>
+                            <%= drink_styles[@whisky.drink_style] || @whisky.drink_style %>
+                        </span>
+                    </div>
+                    
+                    <% if @whisky.glass_name.present? %>
+                    <div>
+                        <span class="detail-label">グラス</span>
+                        <span class="detail-value"><%= @whisky.glass_name %></span>
+                    </div>
+                    <% end %>
+                    
+                    <% if @whisky.glass_rating.present? %>
+                    <div>
+                        <span class="detail-label">グラスとの相性</span>
+                        <div class="text-2xl whisky-gold">
+                            <%= "★" * @whisky.glass_rating %><%= "☆" * (5 - @whisky.glass_rating) %>
+                            <span class="text-lg text-gray-300">(<%= @whisky.glass_rating %>/5)</span>
+                        </div>
+                    </div>
+                    <% end %>
+                    
+                    <div>
+                        <span class="detail-label">ピート（スモーキーさ）</span>
+                        <span class="detail-value"><%= @whisky.peat ? "有り" : "無し" %></span>
+                    </div>
+                    
+                    <% if @whisky.aromas.present? && @whisky.aromas.any? %>
+                    <div>
+                        <span class="detail-label">香り (タグ)</span>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <% 
+                              aroma_labels = {
+                                "peat" => "ピート (スモーキー)",
+                                "iodine" => "ヨード (薬品, 磯)",
+                                "sweet" => "甘味 (バニラ, 蜂蜜)",
+                                "fruit" => "フルーティー (果実, ベリー)",
+                                "flower" => "フローラル (花, ハーブ)",
+                                "spice" => "スパイシー (胡椒, シナモン)",
+                                "wood" => "ウッディ (樽, オーク)",
+                                "nutty" => "ナッツ (アーモンド, ヘーゼルナッツ)",
+                                "grain" => "穀物 (麦芽, 穀類)",
+                                "citrus" => "柑橘 (レモン, オレンジ)"
+                              }
+                            %>
+                            <% @whisky.aromas.each do |aroma| %>
+                                <span class="bg-blue-900 text-blue-200 text-sm font-semibold px-3 py-1 rounded-full">
+                                    <%= aroma_labels[aroma] || aroma %>
+                                </span>
+                            <% end %>
+                        </div>
+                    </div>
+                    <% end %>
+                    
+                    <% if @whisky.details.present? %>
+                    <div>
+                        <span class="detail-label">詳細 (テイスティングノート)</span>
+                        <p class="text-gray-300 whitespace-pre-line leading-relaxed">
+<%= @whisky.details %>
+                        </p>
+                    </div>
+                    <% end %>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- 編集ボタンエリア -->
+        <% if user_signed_in? && @whisky.user == current_user %>
+        <div class="max-w-5xl mx-auto mt-10 text-center space-x-4">
+            <%= link_to edit_whisky_path(@whisky), class: "inline-flex items-center justify-center bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 cursor-pointer shadow-xl transform hover:scale-105" do %>
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                編集する
+            <% end %>
+            
+            <%= link_to whisky_path(@whisky), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか?" }, class: "inline-flex items-center justify-center bg-red-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-red-700 transition duration-300 cursor-pointer shadow-xl transform hover:scale-105" do %>
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                削除する
+            <% end %>
+        </div>
+        <% end %>
+
+        <!-- サジェスチョンエリア (今後実装) -->
+        <!-- <section class="mt-16">
+            <h2 class="font-serif text-3xl font-bold text-center mb-8">
+                このウイスキーが好きな方へ
+            </h2>
+        </section> -->
+
+    </main>
+
+    <footer class="bg-black text-gray-400 py-8 mt-16">
+        <%= render partial: "footer" %>
+    </footer>
+
+</body>
+</html>
