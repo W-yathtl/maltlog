@@ -3,24 +3,32 @@ class WhiskiesController < ApplicationController
   def index
     
   end
+ def new
+    @whisky = current_user.whiskies.new(aromas: []) # 初期化して配列として扱えるようにする
+  end
 
-  def new
-    @whisky = Whisky.new
-    @aroma_options = [
-      ['sweet', '甘味 (バニラ, 蜂蜜)'],
-      ['citrus', '柑橘 (レモン, オレンジ)'],
-      ['cream', 'クリーム (バター, ナッツ)'],
-      ['flower', '花 (フローラル)'],
-      ['wine', 'ワイン (シェリー, 熟成感)'],
-      ['iodine', 'ヨード (薬品, 磯)'],
-      ['peat', 'ピート (スモーキー)']
-    ]
+  def create
+    @whisky = current_user.whiskies.new(whisky_params)
+    if @whisky.save
+      redirect_to @whisky, notice: "ウイスキーを記録しました"
+    else
+      render :new
+    end
   end
 
   def show
+  
   end
 
   private
+
+  def whisky_params
+    params.require(:whisky).permit(
+      :whisky_name, :drink_style, :glass_name, :glass_rating, :peat, :details,
+      :whisky_photo, :glass_photo,
+      aromas: [] # 配列として許可
+    )
+  end
 
   def move_to_index
     unless user_signed_in?

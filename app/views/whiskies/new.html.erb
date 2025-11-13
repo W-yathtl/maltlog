@@ -1,96 +1,282 @@
-<!-- app/views/whiskies/new.html.erb -->
-<%= form_with model: @whisky, local: true, html: { multipart: true, class: "bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg space-y-6" } do |f| %>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisky Log - 記録画面</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- フォント (トップページから継承) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #1a1a1a; /* 非常に暗いグレー（ほぼ黒） */
+            color: #e0e0e0; /* 明るすぎない白 */
+        }
+        .font-serif {
+            font-family: 'Noto Serif JP', serif;
+        }
+        /* ウイスキーの琥珀色（アクセント） */
+        .whisky-gold {
+            color: #eab308; /* Tailwindの amber-500 */
+        }
+        .bg-whisky-gold {
+            background-color: #eab308;
+        }
+        .border-whisky-gold {
+            border-color: #eab308;
+        }
 
-  <!-- 1. 銘柄 -->
-  <div>
-    <%= f.label :whisky_name, "銘柄", class: "block text-lg font-semibold mb-2" %>
-    <span class="text-red-500 ml-2">*</span>
-    <%= f.text_field :whisky_name, class: "form-input-dark", placeholder: "例: ラフロイグ 10年", required: true %>
+        /* ダークモード用のフォームスタイル */
+        .form-input-dark {
+            background-color: #374151; /* gray-700 */
+            border: 1px solid #4b5563; /* gray-600 */
+            color: #e0e0e0;
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            width: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input-dark:focus {
+            outline: none;
+            border-color: #eab308; /* whisky-gold */
+            box-shadow: 0 0 0 2px #eab308;
+        }
 
-    <!-- ボトル写真 -->
-    <%= f.label :whisky_photo, "ボトルの写真（任意）", class: "block text-sm font-medium text-gray-400 mt-4 mb-1" %>
-    <%= f.file_field :whisky_photo, class: "form-file-dark", accept: "image/*" %>
-  </div>
+        /* ラジオボタン・チェックボックスのカスタムスタイル */
+        .form-check-dark {
+            accent-color: #eab308; /* whisky-gold */
+        }
 
-  <!-- 2. 飲み方 -->
-  <div>
-    <%= f.label :drink_style, "飲み方", class: "block text-lg font-semibold mb-2" %>
-    <span class="text-red-500 ml-2">*</span>
-    <%= f.select :drink_style, options_for_select([["ストレート", "straight"], ["オンザロック", "on_the_rock"], ["ハイボール", "highball"], ["水割り", "mizuwari"], ["お湯割り", "oyuwari"], ["その他", "other"]]), { prompt: "選択してください" }, class: "form-input-dark", required: true %>
-  </div>
+        /* (ここから追加) ファイル入力のスタイル */
+        .form-file-dark {
+            display: block;
+            width: 100%;
+            background-color: #374151; /* gray-700 */
+            border: 1px solid #4b5563; /* gray-600 */
+            border-radius: 0.5rem; /* rounded-lg */
+            color: #9ca3af; /* gray-400 */
+            font-size: 0.875rem; /* text-sm */
+        }
+        /* (Chrome/Edge/Firefox) ファイル選択ボタンのスタイル */
+        .form-file-dark::file-selector-button {
+            background-color: #4b5563; /* gray-600 */
+            border: none;
+            color: #e0e0e0;
+            padding: 0.75rem 1rem; /* py-3 px-4 と高さを合わせる */
+            margin-right: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .form-file-dark::file-selector-button:hover {
+            background-color: #5a6a80; /* 少し明るいグレー */
+        }
+        /* (ここまで追加) */
 
-  <!-- 3. グラス -->
-  <div>
-    <%= f.label :glass_name, "グラス（任意）", class: "block text-lg font-semibold mb-2" %>
-    <%= f.text_field :glass_name, class: "form-input-dark", placeholder: "例: グレンケアン" %>
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
 
-    <!-- グラス写真 -->
-    <%= f.label :glass_photo, "グラスの写真（任意）", class: "block text-sm font-medium text-gray-400 mt-4 mb-1" %>
-    <%= f.file_field :glass_photo, class: "form-file-dark", accept: "image/*" %>
-  </div>
+    <!-- 
+    <!-- ===== ヘッダー ===== -->
+<header class="bg-black bg-opacity-70 sticky top-0 z-50 backdrop-blur-sm">
+  <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <!-- ロゴ -->
+    <%= link_to root_path, class: "text-2xl font-bold font-serif" do %>
+      <span class="whisky-gold">M</span>alt <span class="whisky-gold">L</span>og
+    <% end %>
 
-  <!-- 3.5 グラスとの相性 -->
-  <div>
-    <%= f.label :glass_rating, "グラスとの相性（任意）", class: "block text-lg font-semibold mb-2" %>
-    <div class="flex flex-wrap gap-x-6 gap-y-3 items-center mt-3">
-      <% (1..5).each do |i| %>
-        <label class="flex items-center cursor-pointer">
-          <%= f.radio_button :glass_rating, i, class: "form-check-dark w-5 h-5 mr-2" %>
-          <span><%= "★#{i}" %> <%= "(最高)" if i==5 %></span>
-        </label>
+    <!-- ナビゲーション（デスクトップ） -->
+    <div class="hidden md:flex items-center space-x-6">
+      <!-- 共通 -->
+      <%= link_to "ウイスキーを探す", "#recommend", class: "hover:text-whisky-gold transition duration-300" %>
+
+      <% if user_signed_in? %>
+        <!-- ログイン時のみ表示 -->
+        <%= link_to current_user.nickname, "#mypage", class: "nav-user hover:text-whisky-gold transition duration-300" %>
+        <li><%= link_to 'ログアウト', destroy_user_session_path, data: { turbo_method: :delete }, class: "logout" %></li>
+      <% else %>
+        <!-- ログアウト時のみ表示 -->
+        <%= link_to "新規登録", new_user_registration_path, class: "nav-guest hover:text-whisky-gold transition duration-300" %>
+        <%= link_to "ログイン", new_user_session_path, class: "nav-guest bg-whisky-gold text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300" %>
       <% end %>
     </div>
-  </div>
 
-  <!-- 4. ピート -->
-  <div>
-    <%= f.label :peat, "ピート（スモーキーさ）", class: "block text-lg font-semibold mb-2" %>
-    <div class="flex space-x-6 items-center mt-3">
-      <label class="flex items-center cursor-pointer">
-        <%= f.radio_button :peat, "yes", class: "form-check-dark w-5 h-5 mr-2" %>
-        <span>有り</span>
-      </label>
-      <label class="flex items-center cursor-pointer">
-        <%= f.radio_button :peat, "no", checked: true, class: "form-check-dark w-5 h-5 mr-2" %>
-        <span>無し</span>
-      </label>
+    <!-- モバイル用メニューボタン -->
+    <div class="md:hidden">
+      <button class="text-gray-200 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
     </div>
-  </div>
+  </nav>
+</header>
 
-  <!-- 5. 香り（複数選択可） -->
-  <div>
-    <%= f.label :aromas, "香り（複数選択可）", class: "block text-lg font-semibold mb-2" %>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-      <% ["sweet", "citrus", "cream", "flower", "wine", "iodine", "peat"].each do |aroma| %>
-        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
-          <%= check_box_tag "whisky[aromas][]", aroma, @whisky.aromas&.include?(aroma), class: "form-check-dark w-5 h-5 mr-3" %>
-          <span>
-            <%=
-              case aroma
-              when "sweet" then "甘味 (バニラ, 蜂蜜)"
-              when "citrus" then "柑橘 (レモン, オレンジ)"
-              when "cream" then "クリーム (バター, ナッツ)"
-              when "flower" then "花 (フローラル)"
-              when "wine" then "ワイン (シェリー, 熟成感)"
-              when "iodine" then "ヨード (薬品, 磯)"
-              when "peat" then "ピート (スモーキー)"
-              end
-            %>
-          </span>
-        </label>
-      <% end %>
-    </div>
-  </div>
+    <!-- ===== メインコンテンツ (記録フォーム) ===== -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <div class="max-w-3xl mx-auto">
+            <h1 class="font-serif text-4xl font-bold mb-8 text-center">
+                ウイスキーを記録する
+            </h1>
 
-  <!-- 6. 詳細 -->
-  <div>
-    <%= f.label :details, "詳細（テイスティングノート）", class: "block text-lg font-semibold mb-2" %>
-    <%= f.text_area :details, rows: 6, class: "form-input-dark", placeholder: "例: 香りは強烈なピートとヨード香。味わいは薬品のような刺激とスモーキーさ。後味はスッキリ。" %>
-  </div>
+            <form action="#" method="POST" class="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg space-y-6">
 
-  <!-- 送信ボタン -->
-  <div class="text-center pt-4">
-    <%= f.submit "この内容で記録する", class: "bg-whisky-gold text-gray-900 font-bold py-3 px-10 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 w-full sm:w-auto" %>
-  </div>
+                <!-- 1. 銘柄 -->
+                <div>
+                    <label for="whisky_name" class="block text-lg font-semibold mb-2">銘柄<span class="text-red-500 ml-2">*</span></label>
+                    <input type="text" id="whisky_name" class="form-input-dark" placeholder="例: ラフロイグ 10年" required>
+                    
+                    <!-- (ここから変更) ボトル写真アップロード -->
+                    <label for="whisky_photo" class="block text-sm font-medium text-gray-400 mt-4 mb-1">ボトルの写真（任意）</label>
+                    <input type="file" id="whisky_photo" class="form-file-dark" accept="image/*">
+                    <!-- (ここまで変更) -->
+                </div>
 
-<% end %>
+                <!-- 2. 飲み方 -->
+                <div>
+                    <label for="drink_style" class="block text-lg font-semibold mb-2">飲み方<span class="text-red-500 ml-2">*</span></label>
+                    <select id="drink_style" class="form-input-dark" required>
+                        <option value="" disabled selected>選択してください</option>
+                        <option value="straight">ストレート</option>
+                        <option value="on_the_rock">オンザロック</option>
+                        <option value="highball">ハイボール</option>
+                        <option value="mizuwari">水割り</option>
+                        <option value="oyuwari">お湯割り</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+
+                <!-- 3. グラス -->
+                <div>
+                    <label for="glass_name" class="block text-lg font-semibold mb-2">グラス（任意）</label>
+                    <input type="text" id="glass_name" class="form-input-dark" placeholder="例: グレンケアン">
+
+                    <!-- (ここから変更) グラス写真アップロード -->
+                    <label for="glass_photo" class="block text-sm font-medium text-gray-400 mt-4 mb-1">グラスの写真（任意）</label>
+                    <input type="file" id="glass_photo" class="form-file-dark" accept="image/*">
+                    <!-- (ここまで変更) -->
+                </div>
+
+                <!-- 3.5 グラスとの相性 (ここから追加) -->
+                <div>
+                    <label class="block text-lg font-semibold mb-2">グラスとの相性（任意）</label>
+                    <!-- 
+                        モバイルでも改行されるように flex-wrap と gap を使用します。
+                        プロトタイプとして「評価できる」ことが伝われば良いので、
+                        シンプルなラジオボタンで実装します。
+                    -->
+                    <div class="flex flex-wrap gap-x-6 gap-y-3 items-center mt-3">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="glass_rating" value="1" class="form-check-dark w-5 h-5 mr-2">
+                            <span>★1</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="glass_rating" value="2" class="form-check-dark w-5 h-5 mr-2">
+                            <span>★2</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="glass_rating" value="3" class="form-check-dark w-5 h-5 mr-2">
+                            <span>★3</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="glass_rating" value="4" class="form-check-dark w-5 h-5 mr-2">
+                            <span>★4</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="glass_rating" value="5" class="form-check-dark w-5 h-5 mr-2">
+                            <span>★5 (最高)</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- (ここまで追加) -->
+
+                <!-- 4. ピート -->
+                <div>
+                    <label class="block text-lg font-semibold mb-2">ピート（スモーキーさ）</label>
+                    <div class="flex space-x-6 items-center mt-3">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="peat" value="yes" class="form-check-dark w-5 h-5 mr-2">
+                            <span>有り</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="peat" value="no" class="form-check-dark w-5 h-5 mr-2" checked>
+                            <span>無し</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 5. 香り（複数選択可） -->
+                <div>
+                    <label class="block text-lg font-semibold mb-2">香り（複数選択可）</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                        <!-- 選択肢を動的に生成（ダミー） -->
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="sweet" class="form-check-dark w-5 h-5 mr-3">
+                            <span>甘味 (バニラ, 蜂蜜)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="citrus" class="form-check-dark w-5 h-5 mr-3">
+                            <span>柑橘 (レモン, オレンジ)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="cream" class="form-check-dark w-5 h-5 mr-3">
+                            <span>クリーム (バター, ナッツ)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="flower" class="form-check-dark w-5 h-5 mr-3">
+                            <span>花 (フローラル)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="wine" class="form-check-dark w-5 h-5 mr-3">
+                            <span>ワイン (シェリー, 熟成感)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="iodine" class="form-check-dark w-5 h-5 mr-3">
+                            <span>ヨード (薬品, 磯)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                            <input type="checkbox" name="aroma" value="peat" class="form-check-dark w-5 h-5 mr-3">
+                            <span>ピート (スモーキー)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 6. 詳細 -->
+                <div>
+                    <label for="details" class="block text-lg font-semibold mb-2">詳細（テイスティングノート）</label>
+                    <textarea id="details" rows="6" class="form-input-dark" placeholder="例: 香りは強烈なピートとヨード香。味わいは薬品のような刺激とスモーキーさ。後味はスッキリ。"></textarea>
+                </div>
+
+                <!-- 送信ボタン -->
+                <div class="text-center pt-4">
+                    <button type="submit" class="bg-whisky-gold text-gray-900 font-bold py-3 px-10 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 w-full sm:w-auto">
+                        この内容で記録する
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+    <!-- ===== フッター (トップページから流用) ===== -->
+    <footer class="bg-black text-gray-400 py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Malt Log. All rights reserved.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="hover:text-white">利用規約</a>
+                <a href="#" class="hover:text-white">プライバシーポリシー</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- このページにはJavaScriptのロジックは不要です -->
+
+</body>
+</html>

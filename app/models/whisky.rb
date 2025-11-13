@@ -8,7 +8,10 @@ class Whisky < ApplicationRecord
 
   validates :whisky_name, :drink_style, presence: true
   validates :glass_rating, inclusion: { in: 1..5 }, allow_nil: true
-  validates :details, length: { maximum: 300 }, allow_nil: true
+  validates :details, length: { maximum: 1000 }, allow_nil: true
+
+  # JSON配列として扱う
+  attribute :aromas, :string, default: []
 
   validate :aromas_must_be_array_of_allowed_values
 
