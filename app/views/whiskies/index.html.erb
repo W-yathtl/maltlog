@@ -38,41 +38,8 @@
 </head>
 <body class="bg-gray-900 text-gray-200">
 
-    <!-- ===== ヘッダー ===== -->
-<header class="bg-black bg-opacity-70 sticky top-0 z-50 backdrop-blur-sm">
-  <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-    <!-- ロゴ -->
-    <div class="text-2xl font-bold font-serif">
-      <span class="whisky-gold">M</span>alt <span class="whisky-gold">L</span>og
-    </div>
-
-    <!-- ナビゲーション（デスクトップ） -->
-    <div class="hidden md:flex items-center space-x-6">
-      <!-- 共通 -->
-      <%= link_to "ウイスキーを探す", "#recommend", class: "hover:text-whisky-gold transition duration-300" %>
-
-      <% if user_signed_in? %>
-        <!-- ログイン時のみ表示 -->
-        <%= link_to "ウイスキーを記録する", "#create-log", class: "nav-user bg-whisky-gold text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300" %>
-        <%= link_to current_user.nickname, "#mypage", class: "nav-user hover:text-whisky-gold transition duration-300" %>
-        <li><%= link_to 'ログアウト', destroy_user_session_path, data: { turbo_method: :delete }, class: "logout" %></li>
-      <% else %>
-        <!-- ログアウト時のみ表示 -->
-        <%= link_to "新規登録", new_user_registration_path, class: "nav-guest hover:text-whisky-gold transition duration-300" %>
-        <%= link_to "ログイン", new_user_session_path, class: "nav-guest bg-whisky-gold text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300" %>
-      <% end %>
-    </div>
-
-    <!-- モバイル用メニューボタン -->
-    <div class="md:hidden">
-      <button class="text-gray-200 focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-    </div>
-  </nav>
-</header>
+    <%# ヘッダー %>
+    <%= render partial: "header" %>
 
     <!-- ===== メインコンテンツ ===== -->
     <main>
@@ -90,18 +57,11 @@
                 </h1>
                 <p class="text-xl text-gray-300 mb-8">予算内で見つかる、あなた好みの一本と飲み方を記録・発見しよう。</p>
                 
-                <!-- ログアウト時 -->
-                <div class="nav-guest">
-                    <a href="#register" class="bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300">
-                        今すぐ始める (無料)
-                    </a>
-                </div>
-                <!-- ログイン時 -->
-                <div class="nav-user">
-                    <a href="#create-log" class="bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300">
-                        試行ログを作成する
-                    </a>
-                </div>
+                <% if user_signed_in? %>
+                  <%= link_to "試行ログを作成する", new_whisky_path, class: "bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300" %>
+                <% else %>
+                  <%= link_to "今すぐ始める (無料)", new_user_registration_path, class: "bg-whisky-gold text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-600 transition duration-300" %>
+                <% end %>
             </div>
         </section>
 
@@ -111,11 +71,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- 記録する -->
                 <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
+                  <%= link_to new_whisky_path, class: "block" do %>
                     <h2 class="font-serif text-3xl font-semibold mb-4 whisky-gold">記録する (Log)</h2>
-                    <p class="text-gray-300 mb-6">飲んだウイスキー、飲み方、グラス、感想を記録。あなただけのデータベースを構築。</p>
-                    <a href="#create-log" class="nav-user text-whisky-gold font-semibold hover:underline">▶ ログ作成ページへ</a>
-                    <p class="nav-guest text-gray-500">（ログイン後に利用可能です）</p>
-                </div>
+                        <p class="text-gray-300 mb-6">飲んだウイスキー、飲み方、グラス、感想を記録。あなただけのデータベースを構築。</p>
+                    <% end %>
+                  <%= link_to "▶ ログ作成ページへ", new_whisky_path, class: "nav-user text-whisky-gold font-semibold hover:underline" %>
+                  <p class="nav-guest text-gray-500">（ログイン後に利用可能です）</p>
+            </div>
                 <!-- 探す -->
                 <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
                     <h2 class="font-serif text-3xl font-semibold mb-4 whisky-gold">探す (Discover)</h2>
@@ -125,172 +87,5 @@
             </div>
         </section>
         
-        <!-- 3. おすすめウイスキー (レコメンド機能ダミー) -->
-        <section id="recommend-whisky" class="bg-gray-900 py-16">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="font-serif text-3xl font-bold text-center mb-8">おすすめのウイスキー</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- ダミーカード -->
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="https://placehold.co/600x400/d1a10f/1a1a1a?text=Whisky+1" alt="ウイスキー" class="w-full h-48 object-cover">
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold">ラフロイグ 10年</h3>
-                            <p class="text-sm text-gray-400 mb-2">予算: 約6,000円</p>
-                            <p class="text-gray-300 text-sm">（あなたの好み「スモーキー」に一致）</p>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="https://placehold.co/600x400/e8c1a0/1a1a1a?text=Whisky+2" alt="ウイスキー" class="w-full h-48 object-cover">
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold">山崎 12年</h3>
-                            <p class="text-sm text-gray-400 mb-2">予算: 約20,000円</p>
-                            <p class="text-gray-300 text-sm">（あなたの好み「フルーティー」に一致）</p>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="https://placehold.co/600x400/a0522d/1a1a1a?text=Whisky+3" alt="ウイスキー" class="w-full h-48 object-cover">
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold">メーカーズマーク</h3>
-                            <p class="text-sm text-gray-400 mb-2">予算: 約3,000円</p>
-                            <p class="text-gray-300 text-sm">（予算内で高評価のバーボン）</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. おすすめグラス (追加機能ダミー) -->
-        <section id="recommend-glass" class="py-16">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="font-serif text-3xl font-bold text-center mb-8">飲み方に合わせたグラス</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- ダミーカード -->
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden p-5 text-center">
-                        <img src="https://placehold.co/300x300/555555/e0e0e0?text=Glencairn" alt="グラス" class="w-32 h-32 object-contain mx-auto mb-4 rounded-lg">
-                        <h3 class="text-xl font-bold">グレンケアン</h3>
-                        <p class="text-sm text-gray-400 mb-2">（ストレート / 香りを楽しむ）</p>
-                        <p class="text-gray-300 text-sm mb-4">香りを立たせる形状。テイスティングに最適。</p>
-                        <a href="#" class="text-whisky-gold font-semibold hover:underline">購入リンク (〜2,000円) &raquo;</a>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden p-5 text-center">
-                        <img src="https://placehold.co/300x300/555555/e0e0e0?text=Tumbler" alt="グラス" class="w-32 h-32 object-contain mx-auto mb-4 rounded-lg">
-                        <h3 class="text-xl font-bold">ロックグラス (タンブラー)</h3>
-                        <p class="text-sm text-gray-400 mb-2">（ロック / カジュアル）</p>
-                        <p class="text-gray-300 text-sm mb-4">大きな氷を入れてもしっかり持てる安定感。</p>
-                        <a href="#" class="text-whisky-gold font-semibold hover:underline">購入リンク (〜3,000円) &raquo;</a>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden p-5 text-center">
-                        <img src="https://placehold.co/300x300/555555/e0e0e0?text=Highball+Glass" alt="グラス" class="w-32 h-32 object-contain mx-auto mb-4 rounded-lg">
-                        <h3 class="text-xl font-bold">うすはりタンブラー</h3>
-                        <p class="text-sm text-gray-400 mb-2">（ハイボール / 水割り）</p>
-                        <p class="text-gray-300 text-sm mb-4">口当たりが良く、炭酸の爽快感を引き立てる。</p>
-                        <a href="#" class="text-whisky-gold font-semibold hover:underline">購入リンク (〜5,000円) &raquo;</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. 最新の試行ログ (ダミー) -->
-        <section id="logs" class="bg-gray-900 py-16">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                 <h2 class="font-serif text-3xl font-bold text-center mb-8">最新の試行ログ</h2>
-                 <!-- 
-                    前回のプロトタイプ（明るい版）にあったログカードのデザインを
-                    ダークモードに適用したものです。
-                 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- ダミーカード 1 -->
-                    <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                        <img src="https://placehold.co/600x400/d1a10f/1a1a1a?text=Laphroaig+10y" alt="ウイスキーの画像" class="w-full h-48 object-cover">
-                        <div class="p-5">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold text-gray-100">ラフロイグ 10年</h3>
-                                <div class="flex items-center text-yellow-500">★★★★☆</div>
-                            </div>
-                            <p class="text-sm text-gray-400 mb-3">by @whisky_lover</p>
-                            <div class="mb-3">
-                                <span class="inline-block bg-blue-900 text-blue-200 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">飲み方: ストレート</span>
-                                <span class="inline-block bg-green-900 text-green-200 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">グラス: グレンケアン</span>
-                            </div>
-                            <p class="text-gray-300 text-sm">
-                                <span class="font-semibold text-gray-200">香り:</span> 強烈なピートとヨード香。奥に甘さも。
-                            </p>
-                        </div>
-                    </div>
-                    <!-- 他のカード（省略） -->
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ===== フッター ===== -->
-    <footer class="bg-black text-gray-400 py-8">
-        <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2025 Whisky Log. All rights reserved.</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="hover:text-white">利用規約</a>
-                <a href="#" class="hover:text-white">プライバシーポリシー</a>
-            </div>
-        </div>
-    </footer>
-
-
-    <!-- ===== JavaScript ===== -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginToggle = document.getElementById('loginToggle');
-            const navGuestElements = document.querySelectorAll('.nav-guest');
-            const navUserElements = document.querySelectorAll('.nav-user');
-
-            function updateUI(isLoggedIn) {
-                // ログアウト時の要素
-                navGuestElements.forEach(el => {
-                    el.style.display = isLoggedIn ? 'none' : 'block';
-                });
-                
-                // ログイン時の要素
-                navUserElements.forEach(el => {
-                    el.style.display = isLoggedIn ? 'block' : 'none';
-                });
-
-                // ヘッダーのflexレイアウト調整（Tailwindの 'hidden' 'md:flex' をJSで制御するのは複雑なため、
-                // 'block' で代用していますが、レイアウトが崩れる場合があります。
-                // プロトタイプとしては 'block'/'none' での表示切り替えで十分意図は伝わります）
-                
-                // デスクトップヘッダーの表示を再調整
-                const desktopNavGuest = document.querySelectorAll('header .nav-guest');
-                desktopNavGuest.forEach(el => {
-                    el.style.display = isLoggedIn ? 'none' : (window.innerWidth >= 768 ? 'block' : 'none');
-                });
-
-                const desktopNavUser = document.querySelectorAll('header .nav-user');
-                desktopNavUser.forEach(el => {
-                    el.style.display = isLoggedIn ? (window.innerWidth >= 768 ? 'block' : 'none') : 'none';
-                });
-                
-                // md:flex の制御（簡易版）
-                 if (window.innerWidth >= 768) {
-                    document.querySelectorAll('header .nav-guest.md\\:flex').forEach(el => el.style.display = isLoggedIn ? 'none' : 'flex');
-                    document.querySelectorAll('header .nav-user.md\\:flex').forEach(el => el.style.display = isLoggedIn ? 'flex' : 'none');
-                }
-
-            }
-
-            // ログイン状態切り替え
-            loginToggle.addEventListener('change', function() {
-                updateUI(this.checked);
-            });
-
-            // 初期表示（デフォルトはログアウト状態）
-            updateUI(false);
-            
-            // リサイズ時にデスクトップ表示を再計算（簡易）
-            window.addEventListener('resize', () => {
-                 updateUI(loginToggle.checked);
-            });
-        });
-    </script>
-
-</body>
-</html>
+        <%# フッターの貼り付け %>
+            <%= render partial: "footer" %>

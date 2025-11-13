@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisky Log - 検索画面</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .font-serif {
+            font-family: 'Noto Serif JP', serif;
+        }
+        .whisky-gold {
+            color: #eab308;
+        }
+        .bg-whisky-gold {
+            background-color: #eab308;
+        }
+        .border-whisky-gold {
+            border-color: #eab308;
+        }
+        .form-input-dark {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input-dark:focus {
+            outline: none;
+            border-color: #eab308;
+            box-shadow: 0 0 0 2px #eab308;
+        }
+        .form-check-dark {
+            accent-color: #eab308;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <%# ヘッダー %>
+    <%= render partial: "header" %>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="font-serif text-4xl font-bold mb-8 text-center">
+                ウイスキーを検索する
+            </h1>
+
+            <!-- 検索フォーム -->
+            <%= form_with url: search_whiskies_path, method: :get, local: true, class: "bg-gray-800 p-6 sm:p-8 rounded-lg shadow-2xl space-y-8 mb-10" do |f| %>
+
+              <!-- キーワード検索 -->
+              <div class="space-y-2">
+                <%= f.label :query, "銘柄名・キーワード検索", class: "block text-lg font-semibold mb-2" %>
+                <%= f.text_field :query, value: params[:query], placeholder: "例: ラフロイグ、シェリー樽、スモーキー", class: "form-input-dark" %>
+              </div>
+
+              <!-- ピート -->
+              <div>
+                <%= f.label :peat, "ピート（スモーキーさ）", class: "block text-lg font-semibold mb-2" %>
+                <div class="flex space-x-6 items-center mt-3">
+                  <label class="flex items-center cursor-pointer">
+                    <%= f.radio_button :peat, "", checked: params[:peat].blank?, class: "form-check-dark w-5 h-5 mr-2" %>
+                    <span>指定なし</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer">
+                    <%= f.radio_button :peat, "true", checked: params[:peat] == "true", class: "form-check-dark w-5 h-5 mr-2" %>
+                    <span>有り</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer">
+                    <%= f.radio_button :peat, "false", checked: params[:peat] == "false", class: "form-check-dark w-5 h-5 mr-2" %>
+                    <span>無し</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 香り（複数選択可） -->
+              <div>
+                <%= f.label :aromas, "香り（複数選択可）", class: "block text-lg font-semibold mb-2" %>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                  <% [
+                    ["甘味 (バニラ, 蜂蜜)", "sweet"],
+                    ["柑橘 (レモン, オレンジ)", "citrus"],
+                    ["クリーム (バター, ナッツ)", "cream"],
+                    ["花 (フローラル)", "flower"],
+                    ["ワイン (シェリー, 熟成感)", "wine"],
+                    ["ヨード (薬品, 磯)", "iodine"],
+                    ["ピート (スモーキー)", "peat"]
+                  ].each do |label, value| %>
+                    <label class="flex items-center cursor-pointer bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
+                      <%= check_box_tag "aromas[]", value, (params[:aromas] || []).include?(value), class: "form-check-dark w-5 h-5 mr-3" %>
+                      <span><%= label %></span>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- 送信ボタン -->
+              <div class="flex gap-4 pt-4">
+                <%= f.submit "検索する", class: "bg-whisky-gold text-gray-900 font-bold py-3 px-10 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 flex-1 cursor-pointer" %>
+                <%= link_to "条件をクリア", search_whiskies_path, class: "bg-gray-600 text-white font-bold py-3 px-10 rounded-lg text-lg hover:bg-gray-500 transition duration-300 flex-1 text-center" %>
+              </div>
+
+            <% end %>
+
+            <!-- 検索結果 -->
+            <% if params[:query].present? || params[:peat].present? || (params[:aromas].present? && params[:aromas].any?) %>
+              <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b border-gray-700 pb-2">
+                  検索結果: <%= @whiskies.count %>件
+                </h2>
+
+                <% if @whiskies.any? %>
+                  <div class="space-y-4">
+                    <% @whiskies.each do |whisky| %>
+                      <%= link_to whisky_path(whisky), class: "block" do %>
+                        <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition duration-300 flex gap-4">
+                          <!-- 画像 -->
+                          <div class="flex-shrink-0">
+                            <% if whisky.whisky_photo.attached? %>
+                              <%= image_tag whisky.whisky_photo.variant(resize_to_limit: [150, 150]), alt: whisky.whisky_name, class: "w-24 h-24 object-cover rounded-lg" %>
+                            <% else %>
+                              <div class="w-24 h-24 bg-gray-600 rounded-lg flex items-center justify-center">
+                                <span class="text-gray-400 text-xs">No Image</span>
+                              </div>
+                            <% end %>
+                          </div>
+
+                          <!-- 情報 -->
+                          <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-2"><%= whisky.whisky_name %></h3>
+                            <div class="text-sm text-gray-300 space-y-1">
+                              <p>
+                                飲み方: 
+                                <% 
+                                  drink_styles = {
+                                    "straight" => "ストレート",
+                                    "on_the_rock" => "オンザロック",
+                                    "highball" => "ハイボール",
+                                    "mizuwari" => "水割り",
+                                    "oyuwari" => "お湯割り",
+                                    "other" => "その他"
+                                  }
+                                %>
+                                <%= drink_styles[whisky.drink_style] || whisky.drink_style %>
+                              </p>
+                              <p>ピート: <%= whisky.peat ? "有り" : "無し" %></p>
+                              <% if whisky.glass_rating.present? %>
+                                <p class="whisky-gold">グラス評価: <%= "★" * whisky.glass_rating %><%= "☆" * (5 - whisky.glass_rating) %></p>
+                              <% end %>
+                              <% if whisky.aromas.present? && whisky.aromas.any? %>
+                                <div class="flex flex-wrap gap-1 mt-2">
+                                  <% 
+                                    aroma_labels = {
+                                      "sweet" => "甘味",
+                                      "citrus" => "柑橘",
+                                      "cream" => "クリーム",
+                                      "flower" => "花",
+                                      "wine" => "ワイン",
+                                      "iodine" => "ヨード",
+                                      "peat" => "ピート"
+                                    }
+                                  %>
+                                  <% whisky.aromas.first(3).each do |aroma| %>
+                                    <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">
+                                      <%= aroma_labels[aroma] || aroma %>
+                                    </span>
+                                  <% end %>
+                                  <% if whisky.aromas.length > 3 %>
+                                    <span class="text-gray-400 text-xs">+<%= whisky.aromas.length - 3 %></span>
+                                  <% end %>
+                                </div>
+                              <% end %>
+                            </div>
+                            <p class="text-whisky-gold font-semibold mt-2">詳細を見る &raquo;</p>
+                          </div>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="text-center py-8">
+                    <p class="text-gray-400 text-lg">検索条件に一致するウイスキーが見つかりませんでした。</p>
+                    <p class="text-gray-500 text-sm mt-2">条件を変更して再度検索してください。</p>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+        </div>
+    </main>
+
+    <footer class="bg-black text-gray-400 py-8 mt-16">
+        <%= render partial: "footer" %>
+    </footer>
+
+</body>
+</html>

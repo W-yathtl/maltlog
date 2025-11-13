@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisky Log - <%= @user&.nickname || @user&.email&.split('@')&.first || 'ユーザー' %>のページ</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .font-serif {
+            font-family: 'Noto Serif JP', serif;
+        }
+        .whisky-gold {
+            color: #eab308;
+        }
+        .bg-whisky-gold {
+            background-color: #eab308;
+        }
+        .border-whisky-gold {
+            border-color: #eab308;
+        }
+        .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .list-value {
+            font-size: 1rem;
+            color: #e0e0e0;
+        }
+        .star-rating {
+            color: #facc15;
+            font-size: 1.25rem;
+        }
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <%# ヘッダー %>
+    <%= render partial: "header" %>
+
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <div class="max-w-4xl mx-auto">
+            <% if notice %>
+                <div class="bg-green-900 border border-green-700 text-green-200 px-4 py-3 rounded mb-6">
+                    <%= notice %>
+                </div>
+            <% end %>
+            
+            <% if alert %>
+                <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-6">
+                    <%= alert %>
+                </div>
+            <% end %>
+
+            <h1 class="font-serif text-4xl font-bold mb-2 text-center">
+                <%= @user.nickname.presence || @user.email.split('@').first %>のログ
+            </h1>
+            <p class="text-center text-gray-400 mb-8 -mt-2">My Whisky Log</p>
+
+            <!-- ユーザーサマリーエリア -->
+            <div class="bg-gray-800 p-4 sm:p-5 rounded-lg mb-10 shadow-xl flex flex-col sm:flex-row justify-around items-center space-y-4 sm:space-y-0">
+                <div class="text-center p-3">
+                    <span class="detail-label">総記録数</span>
+                    <p class="text-4xl font-extrabold whisky-gold"><%= @whiskies.count %></p>
+                    <p class="text-sm text-gray-400">件</p>
+                </div>
+                <div class="text-center p-3 border-t sm:border-t-0 sm:border-l border-gray-700 sm:pl-8">
+                    <span class="detail-label">最も多い飲み方</span>
+                    <% 
+                      drink_style_counts = @whiskies.group_by(&:drink_style).transform_values(&:count)
+                      most_common_style = drink_style_counts.max_by { |k, v| v }&.first
+                    %>
+                    <p class="text-xl font-bold text-gray-200">
+                        <%= most_common_style ? t("drink_styles.#{most_common_style}", default: most_common_style) : "---" %>
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        <%= @whiskies.count { |w| w.peat } %>件がピート系
+                    </p>
+                </div>
+                <div class="p-3 border-t sm:border-t-0 sm:border-l border-gray-700 sm:pl-8">
+                    <%= link_to new_whisky_path, class: "bg-whisky-gold text-gray-900 font-bold py-3 px-6 rounded-full hover:bg-amber-600 transition duration-300 shadow-xl flex items-center justify-center" do %>
+                        <svg class="w-5 h-5 inline-block mr-2 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        新しいログを記録
+                    <% end %>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-2">記録したウイスキー一覧</h2>
+
+            <% if @whiskies.empty? %>
+                <div class="bg-gray-800 p-8 rounded-lg text-center">
+                    <p class="text-gray-400 mb-4">まだウイスキーを記録していません</p>
+                    <%= link_to "最初のログを記録する", new_whisky_path, class: "bg-whisky-gold text-gray-900 font-bold py-2 px-6 rounded-lg hover:bg-amber-600 transition duration-300" %>
+                </div>
+            <% else %>
+                <!-- ログリスト -->
+                <di<!-- ログリスト -->
+<div class="space-y-6">
+    <% @whiskies.each do |whisky| %>
+        <%= link_to whisky_path(whisky), class: "block" do %>
+            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row hover:shadow-2xl hover:bg-gray-750 transition-all duration-300 transform hover:scale-[1.02] cursor-pointer">
+                <!-- 左: 画像 -->
+                <div class="flex-shrink-0">
+                    <% if whisky.whisky_photo.attached? %>
+                        <%= image_tag whisky.whisky_photo.variant(resize_to_limit: [400, 400]), alt: "#{whisky.whisky_name}の写真", class: "w-full h-48 md:w-48 md:h-full object-cover bg-gray-700" %>
+                    <% else %>
+                        <div class="w-full h-48 md:w-48 md:h-full bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500 text-sm">No Image</span>
+                        </div>
+                    <% end %>
+                </div>
+                
+                <!-- 右: テキスト情報 -->
+                <div class="p-5 flex flex-col justify-between flex-grow">
+                    <div>
+                        <h3 class="font-serif text-2xl font-bold mb-2"><%= whisky.whisky_name %></h3>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <!-- 記録日時 -->
+                            <div>
+                                <span class="detail-label">記録日時</span>
+                                <span class="list-value text-sm"><%= whisky.created_at.strftime('%Y/%m/%d') %></span>
+                            </div>
+                            <!-- 評価（星） -->
+                            <div class="text-right">
+                                <span class="detail-label">グラス評価</span>
+                                <% if whisky.glass_rating.present? %>
+                                    <span class="star-rating">
+                                        <%= "★" * whisky.glass_rating %><%= "☆" * (5 - whisky.glass_rating) %>
+                                    </span>
+                                <% else %>
+                                    <span class="text-gray-500 text-sm">未評価</span>
+                                <% end %>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-3 border-t border-gray-700 pt-3">
+                            <!-- 飲み方 -->
+                            <div>
+                                <span class="detail-label">飲み方</span>
+                                <span class="list-value"><%= t("drink_styles.#{whisky.drink_style}", default: whisky.drink_style) %></span>
+                            </div>
+                            <!-- 香りタグ -->
+                            <div class="text-right">
+                                <span class="detail-label">香りタグ</span>
+                                <% if whisky.aromas.present? %>
+                                    <% whisky.aromas.each do |aroma| %>
+                                        <span class="bg-blue-900 text-blue-200 text-xs font-semibold px-2 py-1 rounded-full">
+                                            <%= t("aromas.#{aroma}", default: aroma) %>
+                                        </span>
+                                    <% end %>
+                                <% end %>
+                                <% if whisky.peat %>
+                                    <span class="bg-amber-900 text-amber-200 text-xs font-semibold px-2 py-1 rounded-full">ピート</span>
+                                <% end %>
+                            </div>
+                        </div>
+                        <% if whisky.details.present? %>
+                            <span class="detail-label mt-2">ログメモの冒頭</span>
+                            <p class="text-gray-300 text-sm leading-relaxed clamp-2">
+                                <%= whisky.details %>
+                            </p>
+                        <% end %>
+                    </div>
+                    <div class="flex justify-end items-center mt-4">
+                        <span class="text-whisky-gold font-semibold">詳細を見る &raquo;</span>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+        
+        <!-- 編集・削除ボタン (本人のみ) -->
+        <% if user_signed_in? && @user == current_user %>
+            <div class="flex justify-end space-x-4 mt-2 px-2">
+                <%= link_to "編集", edit_whisky_path(whisky), class: "text-blue-400 font-semibold hover:underline text-sm" %>
+                <%= button_to "削除", whisky_path(whisky), method: :delete, data: { turbo_confirm: "本当に削除しますか?" }, class: "text-red-400 font-semibold hover:underline text-sm" %>
+            </div>
+        <% end %>
+    <% end %>
+</div>
+            <% end %>
+        </div>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-black text-gray-400 py-8 mt-16">
+      <%# フッターの貼り付け %>
+            <%= render partial: "footer" %>
+    </footer>
+
+</body>
+</html>
