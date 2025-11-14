@@ -9,7 +9,7 @@
     <!-- ナビゲーション（デスクトップ） -->
     <div class="hidden md:flex items-center space-x-6">
       <!-- 共通 -->
-      <%= link_to "ウイスキーを探す", "#recommend", class: "hover:text-whisky-gold transition duration-300" %>
+     <%= link_to "ウイスキーを探す", search_whiskies_path, class: "hover:text-whisky-gold transition duration-300" %>
 
       <% if user_signed_in? %>
         <!-- ログイン時のみ表示 -->

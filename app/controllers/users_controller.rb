@@ -3,8 +3,8 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   
   def show
-    # 現在のログインユーザーを@userに設定
-    @user = current_user
-    @whiskies = @user.whiskies.order(created_at: :desc).to_a
+    @user = User.find(params[:id])
+    @whiskies = @user.whiskies.order(created_at: :desc)
+    @latest_whisky = @whiskies.first
   end
 end

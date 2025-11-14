@@ -48,7 +48,10 @@
             <h1 class="font-serif text-4xl font-bold mb-2">
                 <%= @whisky.whisky_name %>
             </h1>
-            <p class="text-gray-400 mb-6">投稿者: <%= @whisky.user.email.split('@').first %></p>
+          <p class="text-gray-400 mb-6">
+          投稿者: 
+          <%= link_to "#{@whisky.user.nickname.presence || @whisky.user.email.split('@').first}", user_path(@whisky.user), class: "text-whisky-gold hover:underline" %>
+          </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
@@ -108,8 +111,10 @@
                     <% end %>
                     
                     <div>
+
                         <span class="detail-label">ピート（スモーキーさ）</span>
-                        <span class="detail-value"><%= @whisky.peat ? "有り" : "無し" %></span>
+                        <span class="detail-value"><%= @whisky.peat == "true" ? "有り" : "無し" %></span>
+                   
                     </div>
                     
                     <% if @whisky.aromas.present? && @whisky.aromas.any? %>
@@ -143,7 +148,7 @@
                     <div>
                         <span class="detail-label">詳細 (テイスティングノート)</span>
                         <p class="text-gray-300 whitespace-pre-line leading-relaxed">
-<%= @whisky.details %>
+          <%= @whisky.details %>
                         </p>
                     </div>
                     <% end %>

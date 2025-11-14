@@ -1,36 +1,31 @@
-# app/controllers/whiskies_controller.rb
 class WhiskiesController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:index, :show, :search]
   before_action :set_whisky, only: [:show, :edit, :update, :destroy]
-  
-  # GET /whiskies
+  before_action :authorize_user!, only: [:edit, :update, :destroy]
+
   def index
-    @whiskies = current_user.whiskies.order(created_at: :desc)
+    @whiskies = Whisky.all.order(created_at: :desc)
   end
-  
-  # GET /whiskies/:id
+
   def show
-    
+    # @whiskyは既にset_whiskyで設定済み
+    # ここには何も書かない、またはコメントのみ
   end
-  
-  # GET /whiskies/new
+
   def new
     @whisky = Whisky.new
-    @whisky.aromas ||= [] # 空の配列で初期化
   end
-  
-  # POST /whiskies
+
   def create
     @whisky = current_user.whiskies.build(whisky_params)
-    
     if @whisky.save
-      redirect_to whiskies_path, notice: 'ウイスキーを記録しました。'
+      redirect_to @whisky, notice: 'ウイスキーログを作成しました。'
     else
       render :new, status: :unprocessable_entity
     end
   end
-  
-   def edit
+
+  def edit
     # @whiskyは既にset_whiskyで設定済み
   end
 
@@ -47,44 +42,58 @@ class WhiskiesController < ApplicationController
     redirect_to user_path(current_user), notice: 'ウイスキーログを削除しました。'
   end
 
-def search
-  @whiskies = Whisky.all
+  def search
+  # 初期スコープ
+  @whiskies = Whisky.all.order(created_at: :desc)
 
-  # ピートの条件
-  if params[:peat].present?
-    @whiskies = @whiskies.where(peat: params[:peat])
-  end
-
-  # 香りの条件（複数選択対応）
-  if params[:aromas].present?
-    params[:aromas].each do |aroma|
-      @whiskies = @whiskies.where("aromas LIKE ?", "%#{aroma}%")
-    end
-  end
-
-  # キーワード検索
+  # キーワード検索（銘柄名 or 詳細メモ）
   if params[:query].present?
-    @whiskies = @whiskies.where("whisky_name LIKE ?", "%#{params[:query]}%")
+    query = params[:query].strip
+    @whiskies = @whiskies.where("whisky_name LIKE ? OR details LIKE ?", "%#{query}%", "%#{query}%")
   end
+
+  # ピート検索（string型として検索）
+ # ピートフィルタリング
+# ピートフィルタリング
+case params[:peat]
+when "true"
+  @whiskies = @whiskies.where(peat: "true")
+when "false"
+  @whiskies = @whiskies.where(peat: "false")
+# when "", nil の場合は何もしない（全て表示）
 end
   
+  # 香り検索（複数選択可）
+  if params[:aromas].present? && params[:aromas].is_a?(Array)
+    conditions = params[:aromas].map { |_| "JSON_CONTAINS(aromas, ?)" }.join(" OR ")
+    values = params[:aromas].map { |aroma| "\"#{aroma}\"" }
+    @whiskies = @whiskies.where(conditions, *values)
+  end
+end
+
   private
-  
+
   def set_whisky
     @whisky = Whisky.find(params[:id])
   end
-  
- def whisky_params
-  params.require(:whisky).permit(
-    :whisky_name, 
-    :drink_style, 
-    :glass_name, 
-    :glass_rating, 
-    :peat, 
-    :details, 
-    :whisky_photo,  # 追加
-    :glass_photo,   # 追加
-    aromas: []
-  )
+
+  def authorize_user!
+    unless @whisky.user == current_user
+      redirect_to root_path, alert: '権限がありません。'
+    end
+  end
+
+  def whisky_params
+    params.require(:whisky).permit(
+      :whisky_name, 
+      :drink_style, 
+      :glass_name, 
+      :glass_rating, 
+      :peat, 
+      :details, 
+      :whisky_photo,
+      :glass_photo,
+      aromas: []
+    )
   end
 end

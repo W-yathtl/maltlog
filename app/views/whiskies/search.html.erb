@@ -73,10 +73,6 @@
                 <%= f.label :peat, "ピート（スモーキーさ）", class: "block text-lg font-semibold mb-2" %>
                 <div class="flex space-x-6 items-center mt-3">
                   <label class="flex items-center cursor-pointer">
-                    <%= f.radio_button :peat, "", checked: params[:peat].blank?, class: "form-check-dark w-5 h-5 mr-2" %>
-                    <span>指定なし</span>
-                  </label>
-                  <label class="flex items-center cursor-pointer">
                     <%= f.radio_button :peat, "true", checked: params[:peat] == "true", class: "form-check-dark w-5 h-5 mr-2" %>
                     <span>有り</span>
                   </label>
