@@ -6,4 +6,6 @@ class User < ApplicationRecord
  
   has_many :whiskies, dependent: :destroy
 
+  validates :nickname, presence: true
+
 end
