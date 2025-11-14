@@ -9,6 +9,7 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- フォント -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -84,19 +85,33 @@
                 ウイスキーを記録する
             </h1>
 
-            <%= form_with model: @whisky, local: true, html: { class: "bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg space-y-6", multipart: true } do |f| %>
+  <%= form_with model: @whisky, local: true, html: { class: "bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg space-y-6", multipart: true } do |f| %>
       
-      <%# エラーメッセージ表示 %>
-      <% if @whisky.errors.any? %>
-        <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
-          <strong><%= pluralize(@whisky.errors.count, "error") %> prohibited this whisky from being saved:</strong>
-          <ul class="list-disc list-inside mt-2">
-            <% @whisky.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
+ <%# デバッグ用 - インラインスタイル使用 %>
+  <div style="background-color: #1e40af; color: white; padding: 16px; margin-bottom: 16px; border-radius: 8px;">
+    <p style="margin: 4px 0;"><strong>デバッグ情報:</strong></p>
+    <p style="margin: 4px 0;">drink_style: <%= @whisky.drink_style.inspect %></p>
+    <p style="margin: 4px 0;">new_record?: <%= @whisky.new_record? %></p>
+    <p style="margin: 4px 0;">errors: <%= @whisky.errors.full_messages.inspect %></p>
+    <p style="margin: 4px 0;">aromas: <%= @whisky.aromas.inspect %></p>
+  </div>
+
+  <%# エラーメッセージ表示 %>
+  <% if @whisky.errors.any? %>
+    <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+
+
+  <%# エラーメッセージ表示 %>
+  <% if @whisky.errors.any? %>
+    <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+      <strong><%= pluralize(@whisky.errors.count, "error") %> prohibited this whisky from being saved:</strong>
+      <ul class="list-disc list-inside mt-2">
+        <% @whisky.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
       <%# 1. 銘柄 %>
       <div>
@@ -108,24 +123,24 @@
         <%= f.file_field :whisky_photo, accept: "image/*", class: "form-file-dark" %>
       </div>
 
-      <%# 2. 飲み方 %>
-      <div>
-        <%= f.label :drink_style, "飲み方", class: "block text-lg font-semibold mb-2" %>
-        <span class="text-red-500 ml-2">*</span>
-        <%= f.select :drink_style, 
-            options_for_select([
-              ["選択してください", ""],
-              ["ストレート", "straight"],
-              ["オンザロック", "on_the_rock"],
-              ["ハイボール", "highball"],
-              ["水割り", "mizuwari"],
-              ["お湯割り", "oyuwari"],
-              ["その他", "other"]
-            ]), 
-            {}, 
-            { class: "form-input-dark", required: true } 
-        %>
-      </div>
+
+<%# 2. 飲み方 %>
+<div>
+  <%= f.label :drink_style, "飲み方", class: "block text-lg font-semibold mb-2" %>
+  <span class="text-red-500 ml-2">*</span>
+  <%= f.select :drink_style, 
+      [
+        ["ストレート", "straight"],
+        ["オンザロック", "on_the_rock"],
+        ["ハイボール", "highball"],
+        ["水割り", "mizuwari"],
+        ["お湯割り", "oyuwari"],
+        ["その他", "other"]
+      ],
+      {},
+      { class: "form-input-dark", required: true } 
+  %>
+</div>
 
       <%# 3. グラス %>
       <div>

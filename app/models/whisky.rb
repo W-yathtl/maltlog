@@ -1,4 +1,3 @@
-# app/models/whisky.rb
 class Whisky < ApplicationRecord
   belongs_to :user
   
@@ -18,6 +17,7 @@ class Whisky < ApplicationRecord
   # 香りの選択肢
   AROMA_OPTIONS = %w[sweet citrus cream flower wine iodine peat].freeze
   validate :validate_aromas
+  validate :at_least_one_aroma
   
   private
   
@@ -27,6 +27,12 @@ class Whisky < ApplicationRecord
     invalid_aromas = aromas - AROMA_OPTIONS
     if invalid_aromas.any?
       errors.add(:aromas, "に無効な値が含まれています: #{invalid_aromas.join(', ')}")
+    end
+  end
+  
+  def at_least_one_aroma
+    if aromas.blank? || aromas.empty? || aromas.all?(&:blank?)
+      errors.add(:aromas, "を最低1つ選択してください")
     end
   end
 end
