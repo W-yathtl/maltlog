@@ -55,24 +55,25 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
-                <!-- 左カラム: 写真 -->
-                <div class="space-y-6">
-                    <div>
-                        <label class="detail-label mb-2">ボトルの写真</label>
-                        <% if @whisky.whisky_photo.attached? %>
-                        <%= image_tag @whisky.whisky_photo.variant(resize_to_limit: [300, 300]).processed, alt: "ボトルの写真" %>                        <% else %>
-                            <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Bottle+Photo" alt="ボトルの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
-                        <% end %>
-                    </div>
-                    <div>
-                        <label class="detail-label mb-2">グラスの写真</label>
-                        <% if @whisky.glass_photo.attached? %>
-                            <%= image_tag @whisky.glass_photo.variant(resize_to_limit: [300, 300]).processed, alt: "グラスの写真" %>  
-                        <% else %>
-                            <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Glass+Photo" alt="グラスの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
-                        <% end %>
-                    </div>
-                </div>
+          <!-- 左カラム: 写真 -->
+          <div class="space-y-6">
+              <div>
+                  <label class="detail-label mb-2">ボトルの写真</label>
+                  <% if @whisky.whisky_photo.attached? %>
+                      <%= image_tag url_for(@whisky.whisky_photo), alt: "ボトルの写真", class: "w-full h-auto rounded-lg object-contain", style: "max-width: 300px;" %>
+                  <% else %>
+                      <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Bottle+Photo" alt="ボトルの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
+                  <% end %>
+              </div>
+              <div>
+                  <label class="detail-label mb-2">グラスの写真</label>
+                  <% if @whisky.glass_photo.attached? %>
+                      <%= image_tag url_for(@whisky.glass_photo), alt: "グラスの写真", class: "w-full h-auto rounded-lg object-contain", style: "max-width: 300px;" %>
+                  <% else %>
+                      <img src="https://placehold.co/600x600/374151/9ca3af?text=No+Glass+Photo" alt="グラスの写真" class="w-full h-auto rounded-lg object-contain bg-gray-700">
+                  <% end %>
+              </div>
+          </div>
 
                 <!-- 右カラム: 詳細情報 -->
                 <div class="space-y-6">
