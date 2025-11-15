@@ -172,6 +172,23 @@
         </div>
         <% end %>
 
+        <!-- 戻るボタン -->
+        <div class="max-w-5xl mx-auto mt-6 text-center">
+            <% if @referrer&.include?('users') %>
+              <%# ユーザーページから来た場合 %>
+              <%= link_to user_path(@whisky.user), class: "inline-flex items-center justify-center bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-600 transition duration-300 cursor-pointer shadow-xl" do %>
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                  ユーザーページに戻る
+              <% end %>
+            <% else %>
+              <%# 検索ページから来た場合（デフォルト） %>
+              <%= link_to search_whiskies_path(@search_params), class: "inline-flex items-center justify-center bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-600 transition duration-300 cursor-pointer shadow-xl" do %>
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                  検索結果に戻る
+              <% end %>
+            <% end %>
+        </div>
+
         <!-- サジェスチョンエリア (今後実装) -->
         <!-- <section class="mt-16">
             <h2 class="font-serif text-3xl font-bold text-center mb-8">

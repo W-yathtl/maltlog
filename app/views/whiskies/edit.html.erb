@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whisky Log - 記録画面</title>
+    <title>Whisky Log - 編集画面</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
@@ -81,11 +81,11 @@
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="max-w-3xl mx-auto">
             <h1 class="font-serif text-4xl font-bold mb-8 text-center">
-                ウイスキーを記録する
+                ウイスキーを編集する
             </h1>
 
             <%= form_with model: @whisky, local: true, html: { class: "bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg space-y-6", multipart: true } do |f| %>
-      
+
       <%# エラーメッセージ表示 %>
       <% if @whisky.errors.any? %>
         <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
@@ -105,6 +105,9 @@
         <%= f.text_field :whisky_name, placeholder: "例: ラフロイグ 10年", class: "form-input-dark", required: true %>
         
         <%= f.label :whisky_photo, "ボトルの写真（任意）", class: "block text-sm font-medium text-gray-400 mt-4 mb-1" %>
+        <% if @whisky.whisky_photo.attached? %>
+          <p class="text-sm text-gray-400 mb-2">現在の写真: <%= @whisky.whisky_photo.filename %></p>
+        <% end %>
         <%= f.file_field :whisky_photo, accept: "image/*", class: "form-file-dark" %>
       </div>
 
@@ -113,16 +116,15 @@
         <%= f.label :drink_style, "飲み方", class: "block text-lg font-semibold mb-2" %>
         <span class="text-red-500 ml-2">*</span>
         <%= f.select :drink_style, 
-            options_for_select([
-              ["選択してください", ""],
+            [
               ["ストレート", "straight"],
               ["オンザロック", "on_the_rock"],
               ["ハイボール", "highball"],
               ["水割り", "mizuwari"],
               ["お湯割り", "oyuwari"],
               ["その他", "other"]
-            ]), 
-            {}, 
+            ],
+            {},
             { class: "form-input-dark", required: true } 
         %>
       </div>
@@ -133,6 +135,9 @@
         <%= f.text_field :glass_name, placeholder: "例: グレンケアン", class: "form-input-dark" %>
         
         <%= f.label :glass_photo, "グラスの写真（任意）", class: "block text-sm font-medium text-gray-400 mt-4 mb-1" %>
+        <% if @whisky.glass_photo.attached? %>
+          <p class="text-sm text-gray-400 mb-2">現在の写真: <%= @whisky.glass_photo.filename %></p>
+        <% end %>
         <%= f.file_field :glass_photo, accept: "image/*", class: "form-file-dark" %>
       </div>
 
@@ -154,11 +159,11 @@
         <%= f.label :peat, "ピート（スモーキーさ）", class: "block text-lg font-semibold mb-2" %>
         <div class="flex space-x-6 items-center mt-3">
           <label class="flex items-center cursor-pointer">
-            <%= f.radio_button :peat, true, class: "form-check-dark w-5 h-5 mr-2" %>
+            <%= f.radio_button :peat, "true", class: "form-check-dark w-5 h-5 mr-2" %>
             <span>有り</span>
           </label>
           <label class="flex items-center cursor-pointer">
-            <%= f.radio_button :peat, false, class: "form-check-dark w-5 h-5 mr-2", checked: true %>
+            <%= f.radio_button :peat, "false", class: "form-check-dark w-5 h-5 mr-2" %>
             <span>無し</span>
           </label>
         </div>
@@ -167,6 +172,7 @@
       <%# 5. 香り（複数選択可） %>
       <div>
         <%= f.label :aromas, "香り（複数選択可）", class: "block text-lg font-semibold mb-2" %>
+        <span class="text-red-500 ml-2">*</span>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
           <% [
             ["甘味 (バニラ, 蜂蜜)", "sweet"],
@@ -193,7 +199,7 @@
 
       <%# 送信ボタン %>
       <div class="text-center pt-4">
-        <%= f.submit "この内容で記録する", class: "bg-whisky-gold text-gray-900 font-bold py-3 px-10 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 w-full sm:w-auto cursor-pointer" %>
+        <%= f.submit "更新する", class: "bg-whisky-gold text-gray-900 font-bold py-3 px-10 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 w-full sm:w-auto cursor-pointer" %>
       </div>
 
             <% end %>

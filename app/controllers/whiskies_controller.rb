@@ -7,9 +7,13 @@ class WhiskiesController < ApplicationController
     @whiskies = Whisky.all.order(created_at: :desc)
   end
 
+  # whiskies_controller.rb
   def show
     # @whiskyは既にset_whiskyで設定済み
-    # ここには何も書かない、またはコメントのみ
+    # 検索条件をセッションから取得（あれば）
+    @search_params = session[:search_params] || {}
+    # リファラー（遷移元）を保存
+    @referrer = request.referer
   end
 
   def new
@@ -43,6 +47,9 @@ class WhiskiesController < ApplicationController
   end
 
   def search
+  # 検索条件をセッションに保存
+  session[:search_params] = params.slice(:query, :peat, :aromas).to_unsafe_h
+  
   # 初期スコープ
   @whiskies = Whisky.all.order(created_at: :desc)
 
@@ -52,16 +59,13 @@ class WhiskiesController < ApplicationController
     @whiskies = @whiskies.where("whisky_name LIKE ? OR details LIKE ?", "%#{query}%", "%#{query}%")
   end
 
-  # ピート検索（string型として検索）
- # ピートフィルタリング
-# ピートフィルタリング
-case params[:peat]
-when "true"
-  @whiskies = @whiskies.where(peat: "true")
-when "false"
-  @whiskies = @whiskies.where(peat: "false")
-# when "", nil の場合は何もしない（全て表示）
-end
+  # ピート検索
+  case params[:peat]
+  when "true"
+    @whiskies = @whiskies.where(peat: "true")
+  when "false"
+    @whiskies = @whiskies.where(peat: "false")
+  end
   
   # 香り検索（複数選択可）
   if params[:aromas].present? && params[:aromas].is_a?(Array)
